@@ -29,7 +29,6 @@ B = [b1; b2; b3];
 C = inv(A)*B;
 
 hold on;
-
 plot(x, y, 'o', "color", 'k');
 plot(x, C(1) + C(2).*x + C(3).*x.*x, "color", 'r');
 
