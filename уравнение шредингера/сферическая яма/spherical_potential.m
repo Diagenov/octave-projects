@@ -72,16 +72,20 @@ function spherical_potential(l)
 
 
 
-  dE = 10^(-3);         % приращение по энергии
-  E = dE:dE:(1.3*B(3)); % промежуток сравнения
-  E *= coef;            % эВ --> эрг
+  dE = 0.2*(B(3) - B(1));        % расстояние от крайнего корня уравнения до границы графика
+  start_E = max([0, B(1) - dE]); % левая граница графика (не меньше нуля)
+  end_E = B(3) + dE;             % правая граница графика
+
+  dE = (end_E - start_E)/1500; % приращение по энергии
+  E = start_E:dE:end_E;        % промежуток сравнения
+  E *= coef;                   % эВ --> эрг
 
   k = sqrt(2*m*E/h^2); % k^2 из уравнения на электрон в сферической потенциальной яме
   x = L * k;
   y = j_n(l, x);
 
-  y_min = max([-0.5, min(y)]); % при l > 10 около нуля начинает происходить что-то страшное...
-  y_max = min([+0.5, max(y)]);
+  y_min = min(y);
+  y_max = max(y);
 
   E /= coef; % эрг --> эВ
 
@@ -91,21 +95,21 @@ function spherical_potential(l)
   set(gca, 'fontsize', 14);
   xlabel('Энергия, эВ', 'fontsize', 18);
   title('Сравнение корней/нулей аналитического решения (красная линия) с численным решением (синие кружки)', 'fontsize', 16);
-  axis([0, E(end), y_min, y_max]);
+  axis([E(1), E(end), y_min, y_max]);
 
   % сравнение численного решения с аналитикой через корни уравнения: jl(k*r0) = 0
   plot(E, y, 'r', "linewidth", 1.2);
   plot(B(1:3), [0, 0, 0], 'ob', "markersize", 10, "linewidth", 1.2);
   for i=1:3
     plot([B(i), B(i)], [y_min, y_max], '--b', "linewidth", 1.2);
-    text(B(i) + 0.01, 0.9*y_max, sprintf('E_{%d} = %.4f эВ', i, B(i)), "color", 'b', "fontsize", 16);
+    text(B(i) + 0.005*(E(end) - E(1)), 0.9*y_max, sprintf('E_{%d} = %.4f эВ', i, B(i)), "color", 'b', "fontsize", 16);
   endfor
 
-  plot([0,      E(end)], [0,         0], "linewidth", 0.5, "color", 'k'); % ось абсцисс
-  plot([0,      E(end)], [y_max, y_max], "linewidth", 0.5, "color", 'k'); % потолок
+  plot([E(1),   E(end)], [0,         0], "linewidth", 0.5, "color", 'k'); % ось абсцисс
+  plot([E(1),   E(end)], [y_max, y_max], "linewidth", 0.5, "color", 'k'); % потолок
   plot([E(end), E(end)], [y_min, y_max], "linewidth", 0.5, "color", 'k'); % правая стенка
-  plot([0,           0], [y_min, y_max], "linewidth", 0.5, "color", 'k'); % левая стенка
-  plot([0,      E(end)], [y_min, y_min], "linewidth", 0.5, "color", 'k'); % дно
+  plot([E(1),        0], [y_min, y_max], "linewidth", 0.5, "color", 'k'); % левая стенка
+  plot([E(1),   E(end)], [y_min, y_min], "linewidth", 0.5, "color", 'k'); % дно
   hold off;
 
 endfunction
